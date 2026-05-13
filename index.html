@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Parole 2026 — Royale Paillote</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0b0f1a; color: white; overflow-x: hidden; }
+        .serif { font-family: 'Playfair Display', serif; }
+        
+        .bg-mesh {
+            background: radial-gradient(circle at 20% 30%, rgba(186, 117, 23, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(30, 58, 138, 0.2) 0%, transparent 40%);
+            position: fixed; width: 100%; height: 100%; z-index: -1;
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .crea-card {
+            background: #ffffff;
+            color: #1e293b;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6);
+        }
+
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-mesh"></div>
+
+    <div id="screen-auth" class="max-w-md w-full text-center fade-in">
+        <div class="mb-10">
+            <img src="https://2026.vasesdhonneur.org/favicon.ico" class="w-12 h-12 mx-auto mb-6 rounded-full border border-orange-500/50" alt="Logo">
+            <h1 class="text-4xl font-extrabold tracking-tighter mb-4 uppercase leading-none">
+                Retour aux <span class="text-orange-500">Fondamentaux</span>
+            </h1>
+            <p class="text-slate-400 text-sm tracking-wide">L'ÉDITION SPÉCIALE JEUNESSE 2026</p>
+        </div>
+
+        <div class="glass-input p-8 rounded-[2rem]">
+            <p class="text-xs font-semibold text-orange-400 uppercase tracking-[0.2em] mb-6">Accéder au tirage</p>
+            <form onsubmit="generateVerset(event)" class="space-y-4">
+                <input type="text" id="user-name" required
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all"
+                    placeholder="Ton prénom">
+                <input type="email" id="user-email" required
+                    class="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-orange-500/50 transition-all"
+                    placeholder="Ton adresse email">
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl shadow-xl transition-transform active:scale-95">
+                    RÉVÉLER MA PAROLE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="screen-result" class="hidden w-full max-w-lg text-center fade-in">
+        <div id="capture-area" class="p-4">
+            <div class="crea-card rounded-[2.5rem] p-10 md:p-14 relative overflow-hidden text-left border-t-[12px] border-orange-600">
+                <div class="flex justify-between items-center mb-12">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.4em] text-orange-600">Parole de l'année</p>
+                        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">Saison 2026</p>
+                    </div>
+                    <div class="text-slate-200 text-4xl">“</div>
+                </div>
+
+                <div class="mb-12 min-h-[160px] flex flex-col justify-center">
+                    <p id="verset-text" class="serif text-2xl md:text-3xl text-slate-800 leading-[1.6]">
+                        </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="inline-flex px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold tracking-widest uppercase" id="verset-ref">
+                        </div>
+                    <div class="pt-6 border-t border-slate-100 flex justify-between items-center">
+                        <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Royale Paillote</span>
+                        <span id="display-name" class="text-[9px] font-black text-orange-400 uppercase tracking-widest"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 flex flex-col gap-4 px-4">
+            <button onclick="downloadImage()" class="flex items-center justify-center gap-3 bg-white text-slate-900 w-full py-4 rounded-2xl font-black shadow-2xl hover:bg-orange-50 transition-all">
+                TÉLÉCHARGER MON VISUEL
+            </button>
+            <button onclick="window.location.reload()" class="text-slate-500 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors">
+                Faire un nouveau tirage
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Données conçues selon le "Prompt Maître"
+        const versetsDB = {
+            thematique: [
+                { 
+                    ref: "2 TIMOTHÉE 2:15", 
+                    theme: "FONDAMENTAUX", 
+                    paraphrases: ["DIEU te demande de t'appliquer à être un homme approuvé. Étudie Sa Parole pour ne pas avoir à rougir, mais pour tracer droit le chemin de la Vérité en 2026."] 
+                },
+                { 
+                    ref: "APOCALYPSE 3:11", 
+                    theme: "RETOUR", 
+                    paraphrases: ["JÉSUS te dit : « Je viens bientôt ». Retiens fermement ce que tu as appris dans Ses parvis, afin que personne ne vienne dérober ta couronne cette année."] 
+                }
+            ],
+            general: [
+                { 
+                    ref: "PSAUMES 37:5", 
+                    theme: "CONFIANCE", 
+                    paraphrases: ["Recommande ton sort à DIEU, mets en Lui ta confiance totale. Tu verras qu'en 2026, c'est LUI qui agira concrètement dans tes projets."] 
+                }
+            ]
+        };
+
+        function generateVerset(e) {
+            e.preventDefault();
+            const name = document.getElementById('user-name').value;
+            
+            // Logique 80/20
+            const rand = Math.random() * 100;
+            const pool = (rand <= 80) ? versetsDB.thematique : versetsDB.general;
+            const item = pool[Math.floor(Math.random() * pool.length)];
+
+            // Injection
+            document.getElementById('verset-text').innerText = item.paraphrases[0];
+            document.getElementById('verset-ref').innerText = item.ref;
+            document.getElementById('display-name').innerText = `POUR ${name}`;
+
+            // Switch écrans
+            document.getElementById('screen-auth').classList.add('hidden');
+            const res = document.getElementById('screen-result');
+            res.classList.remove('hidden');
+        }
+
+        function downloadImage() {
+            const area = document.getElementById('capture-area');
+            html2canvas(area, {
+                scale: 3, // Haute définition
+                backgroundColor: null,
+                borderRadius: 40
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `MaParole2026.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
